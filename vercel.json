@@ -39,10 +39,9 @@
       ]
     }
   ],
-  "rewrites": [
-    {
-      "source": "/api/frame/(.*)",
-      "destination": "/api/frame/index.js"
+  "functions": {
+    "api/frame/index.js": {
+      "runtime": "nodejs18.x"
     }
-  ]
+  }
 }
