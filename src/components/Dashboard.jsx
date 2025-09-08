@@ -3,6 +3,7 @@ import { TrendingUp, Users, Zap, DollarSign } from 'lucide-react'
 import StatsCard from './StatsCard'
 import RecentActivity from './RecentActivity'
 import TipChart from './TipChart'
+import FarcasterFrame from './FarcasterFrame'
 
 const Dashboard = () => {
   const stats = [
@@ -61,6 +62,29 @@ const Dashboard = () => {
         {stats.map((stat, index) => (
           <StatsCard key={index} {...stat} />
         ))}
+      </div>
+
+      {/* Farcaster Frame Demo */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-white mb-4">Farcaster Frame Integration</h2>
+        <FarcasterFrame 
+          frameData={{
+            id: 'demo-post-1',
+            creator: {
+              username: '@tiplike_demo',
+              address: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
+              avatar: '🎨'
+            },
+            content: 'Check out this amazing Solana-powered tipping system! Like this post to send a micro-tip directly to the creator.',
+            image: 'https://via.placeholder.com/600x300/667eea/ffffff?text=Tip.Like+Demo',
+            timestamp: 'Just now',
+            url: window.location.href
+          }}
+          onAction={(action) => {
+            console.log('Frame action:', action)
+            // Handle frame actions here
+          }}
+        />
       </div>
 
       {/* Main Content Grid */}

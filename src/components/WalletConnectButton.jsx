@@ -1,18 +1,18 @@
-import React, { useState } from 'react'
-import { Wallet, ChevronDown } from 'lucide-react'
-import { useWallet } from './WalletProvider'
+import React from 'react'
+import { Wallet, LogOut } from 'lucide-react'
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import { useWalletIntegration } from '../hooks/useWalletIntegration'
 
-const WalletConnectButton = () => {
-  const { connected, publicKey, balance, connect, disconnect } = useWallet()
-  const [isLoading, setIsLoading] = useState(false)
+const WalletConnectButton = ({ variant = 'primary' }) => {
+  const { connected, balance, disconnect, formatPublicKey, loading } = useWalletIntegration()
+  const { setVisible } = useWalletModal()
 
-  const handleConnect = async () => {
-    setIsLoading(true)
-    try {
-      await connect()
-    } finally {
-      setIsLoading(false)
-    }
+  const handleConnect = () => {
+    setVisible(true)
+  }
+
+  const handleDisconnect = () => {
+    disconnect()
   }
 
   if (connected) {
@@ -23,16 +23,17 @@ const WalletConnectButton = () => {
             {balance.toFixed(2)} SOL
           </span>
           <span className="text-white/70 text-xs">
-            {publicKey?.slice(0, 4)}...{publicKey?.slice(-4)}
+            {formatPublicKey()}
           </span>
         </div>
         <button
-          onClick={disconnect}
+          onClick={handleDisconnect}
           className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-md transition-all duration-200"
+          title="Disconnect Wallet"
         >
           <Wallet className="h-4 w-4" />
           <span className="hidden sm:inline">Connected</span>
-          <ChevronDown className="h-4 w-4" />
+          <LogOut className="h-4 w-4" />
         </button>
       </div>
     )
@@ -41,11 +42,17 @@ const WalletConnectButton = () => {
   return (
     <button
       onClick={handleConnect}
-      disabled={isLoading}
-      className="flex items-center space-x-2 bg-accent hover:bg-accent/90 text-white px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50"
+      disabled={loading}
+      className={`
+        flex items-center space-x-2 transition-all duration-200 disabled:opacity-50 px-4 py-2 rounded-md font-medium
+        ${variant === 'primary' 
+          ? 'bg-accent hover:bg-accent/90 text-white' 
+          : 'bg-white/20 hover:bg-white/30 text-white'
+        }
+      `}
     >
       <Wallet className="h-4 w-4" />
-      <span>{isLoading ? 'Connecting...' : 'Connect Wallet'}</span>
+      <span>{loading ? 'Connecting...' : 'Connect Wallet'}</span>
     </button>
   )
 }
