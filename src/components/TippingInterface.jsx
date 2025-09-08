@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 import { Send, Heart, Users, Zap } from 'lucide-react'
 import TipAmountSelector from './TipAmountSelector'
 import TransactionStatusIndicator from './TransactionStatusIndicator'
-import { useWallet } from './WalletProvider'
+import { useWalletIntegration } from '../hooks/useWalletIntegration'
 
 const TippingInterface = () => {
   const [selectedAmount, setSelectedAmount] = useState(0.1)
   const [recipient, setRecipient] = useState('')
   const [message, setMessage] = useState('')
   const [transactionStatus, setTransactionStatus] = useState(null)
-  const { connected, sendTransaction } = useWallet()
+  const { connected, sendTip, loading } = useWalletIntegration()
 
   const handleSendTip = async () => {
     if (!connected || !recipient || selectedAmount <= 0) return
@@ -17,8 +17,11 @@ const TippingInterface = () => {
     setTransactionStatus('pending')
     
     try {
-      const result = await sendTransaction(selectedAmount, recipient)
+      const result = await sendTip(recipient, selectedAmount, message)
       setTransactionStatus('success')
+      
+      // Log successful transaction
+      console.log('Tip sent successfully:', result)
       
       // Reset form
       setTimeout(() => {
@@ -27,6 +30,7 @@ const TippingInterface = () => {
         setTransactionStatus(null)
       }, 3000)
     } catch (error) {
+      console.error('Tip failed:', error)
       setTransactionStatus('error')
       setTimeout(() => setTransactionStatus(null), 3000)
     }
@@ -119,12 +123,12 @@ const TippingInterface = () => {
 
               <button
                 onClick={handleSendTip}
-                disabled={!connected || !recipient || selectedAmount <= 0 || transactionStatus === 'pending'}
+                disabled={!connected || !recipient || selectedAmount <= 0 || transactionStatus === 'pending' || loading}
                 className="w-full bg-accent hover:bg-accent/90 disabled:bg-white/10 disabled:cursor-not-allowed text-white px-4 py-3 rounded-md font-medium transition-all duration-200 flex items-center justify-center space-x-2"
               >
                 <Send className="h-4 w-4" />
                 <span>
-                  {transactionStatus === 'pending' ? 'Sending...' : `Send ${selectedAmount} SOL`}
+                  {transactionStatus === 'pending' || loading ? 'Sending...' : `Send ${selectedAmount} SOL`}
                 </span>
               </button>
             </div>
